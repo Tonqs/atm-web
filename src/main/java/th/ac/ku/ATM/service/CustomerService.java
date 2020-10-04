@@ -1,39 +1,40 @@
 package th.ac.ku.ATM.service;
 
 import org.mindrot.jbcrypt.BCrypt;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import th.ac.ku.ATM.Data.CustomerRespository;
 import th.ac.ku.ATM.model.Customer;
 
-import javax.annotation.PostConstruct;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class CustomerService {
-    private List<Customer> customerList;
+    private CustomerRespository respository;
 
-    @PostConstruct
-    public void postConstruct(){
-        this.customerList= new ArrayList<>();
+
+    public CustomerService(CustomerRespository respository) {
+        this.respository = respository;
     }
 
     public void createCustomer(Customer customer){
         //hash pin for customer
         String hashPin = hash(customer.getPin());
         customer.setPin(hashPin);
-        customerList.add(customer);
+        respository.save(customer);
     }
 
     public List<Customer> getCustomer(){
-        return new ArrayList<>(this.customerList);
+        return respository.findAll();
     }
 
     public Customer findCustomer(int id) {
-        for (Customer customer : customerList) {
-            if (customer.getId() == id)
-                return customer;
+        try {
+            return respository.findById(id);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
         }
-        return null;
+
     }
 
     public Customer checkPin(Customer inputCustomer) {

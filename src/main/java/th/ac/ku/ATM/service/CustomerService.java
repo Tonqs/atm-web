@@ -7,6 +7,7 @@ import th.ac.ku.ATM.Data.CustomerRespository;
 import th.ac.ku.ATM.model.Customer;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class CustomerService {
@@ -30,8 +31,8 @@ public class CustomerService {
 
     public Customer findCustomer(int id) {
         try {
-            return respository.findById(id);
-        } catch (EmptyResultDataAccessException e) {
+            return respository.findById(id).get();
+        } catch (NoSuchElementException e) {
             return null;
         }
 
